@@ -1,0 +1,168 @@
+﻿<Window x:Class="WpfApp1.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance {x:Type local:ViewModel}}"
+        Title="Поймай меня, если сможешь" Height="700" Width="1050" MinHeight="450" MinWidth="600">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="18"/>
+            <RowDefinition/>
+            <RowDefinition Height="16"/>
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0">
+            <MenuItem Header="Настройки">
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox IsChecked="{Binding IsSoundOn}"/>
+                    <TextBlock Text="Звук" Margin="10,0,0,0"></TextBlock>
+                </StackPanel>
+            </MenuItem>
+        </Menu>
+        <TabControl Grid.Row="1" SelectedIndex="{Binding CurrentTab}">
+            <TabControl.Resources>
+                <Style TargetType="TabItem" BasedOn="{StaticResource HiddenTabItem}"/>
+            </TabControl.Resources>
+            <!--Вкладка "Меню"-->
+            <TabItem>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition Height="60"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <ListBox ItemsSource="{Binding ScoreList}" HorizontalAlignment="Center" 
+                                 MinWidth="200" HorizontalContentAlignment="Center">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <TextBlock Text="{Binding Score}" Margin="0,0,20,0"/>
+                                        <TextBlock Text="{Binding Username}"></TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <!--Счет и кнопка "Сохранить"-->
+                        <StackPanel Grid.Row="1" HorizontalAlignment="Center">
+                            <TextBlock Grid.Row="1" HorizontalAlignment="Center" FontSize="24" Text="{Binding Score, StringFormat='Ваш улов: {0}'}"/>
+                            <Button Content="Сохранить результат" Command="{Binding SaveScoreCommand}" Margin="10" Width="150" Height="40"/>
+                        </StackPanel>
+
+
+                    </Grid>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Новая игра" Command="{Binding StartGameCommand}" Margin="10" Width="100"/>
+                        <Button Content="Выход" Click="Exit" Margin="10" Width="100"/>
+                    </StackPanel>
+
+                </Grid>
+            </TabItem>
+            <!--Вкладка "Игра"-->
+            <TabItem >
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <!--Правая область-->
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="37*"/>
+                            <RowDefinition Height="18*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" TextWrapping="Wrap" Text="{Binding WantedFish.Description}"
+                                   FontSize="18" Margin="20,0,0,20">
+
+                        </TextBlock>
+                        <StackPanel Grid.Row="1" HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="24" Text="Время: "/>
+                                <TextBlock FontSize="24">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0}:{1:00}">
+                                            <Binding Path="Time.Minutes"/>
+                                            <Binding Path="Time.Seconds"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </StackPanel>
+                            <TextBlock Name="tblHaul" FontSize="24" Text="{Binding Score, StringFormat=Улов: {0:F}}"/>
+                            <Button Content="Закончить игру" Height="50" Width="150" Margin="20" Command="{Binding EndGameCommand}"></Button>
+                        </StackPanel>
+
+                    </Grid>
+                    <!--Левая область с картинками-->
+                    <Grid Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="500"/>
+                            <RowDefinition Height="3*"/>
+                        </Grid.RowDefinitions>
+                        <!--Листбокс с рыбами-->
+                        <ListBox Name="listBoxFishes" Grid.Row="0" ItemsSource="{Binding Fishes}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <!--Кнопка-->
+                                    <Button Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBox}},
+                                                  Path=DataContext.SelectImageCommand}" CommandParameter="{Binding Id}"
+                                        Width="160" Height="160"
+                                        MouseEnter="ListBoxFishesItem_OnMouseEnter" MouseLeave="ListBoxFishesItem_OnMouseLeave">
+                                        <!--Включает анимацию-->
+                                        <Button.Triggers>
+                                            <EventTrigger RoutedEvent="Button.MouseEnter">
+                                                <!--Анимация изображения при наведении курсора на кнопку-->
+                                                <BeginStoryboard Name="ImageBeginStoryBoardMouseOn">
+                                                    <Storyboard TargetName="ListBoxImage">
+                                                        <DoubleAnimation Storyboard.TargetProperty="Width"
+                                                        By="-40" AutoReverse="True" 
+                                                                     Duration="0:0:1.00" RepeatBehavior="Forever">
+                                                        </DoubleAnimation>
+                                                        <DoubleAnimation Storyboard.TargetProperty="Height"
+                                                        By="-40"  AutoReverse="True" 
+                                                                     Duration="0:0:1" RepeatBehavior="Forever">
+                                                        </DoubleAnimation>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                            <!--Отключает анимацию изображения-->
+                                            <EventTrigger RoutedEvent="Button.MouseLeave">
+                                                <StopStoryboard BeginStoryboardName="ImageBeginStoryBoardMouseOn"/>
+                                            </EventTrigger>
+                                        </Button.Triggers>
+                                        <!--Картинка-->
+                                        <Image Name="ListBoxImage" Source="{Binding ImageSource}" Width="160" Height="160" >
+                                        </Image>
+
+                                    </Button>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <!--Картинка пойманной рыбы-->
+                        <StackPanel Name="panelWantedFish" Grid.Row="1" Opacity="0" >
+                            <Image Name="imgBigOnListBox" Grid.Column="0"
+                                   VerticalAlignment="Center" HorizontalAlignment="Center" 
+                                   Height="100" Width="300">
+
+                            </Image>
+                            <TextBlock Name="tblWantedFishName" FontSize="14" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                        
+                    </Grid>
+                    
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <TextBlock Grid.Row="2" Margin="10,0,0,0">Агапов А.А., АзНИИРХ, 2018 (с)</TextBlock>
+    </Grid>
+</Window>

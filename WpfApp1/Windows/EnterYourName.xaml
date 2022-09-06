@@ -1,0 +1,21 @@
+﻿<Window x:Class="WpfApp1.Windows.EnterYourName"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="Кто ты, незнакомец?" Height="250" Width="480" >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70"/>
+            <RowDefinition Height="70"/>
+            <RowDefinition Height="70"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Height="50" Margin="10"  FontSize="42" TextAlignment="Center">Введите имя:</TextBlock>
+        <TextBox Name="Username" Grid.Row="1" MinWidth="400" MinHeight="50" HorizontalAlignment="Center" Margin="10" FontSize="42"/>
+        <Button Grid.Row="2" Content="Так меня зовут!" HorizontalAlignment="Center" Height="50" Width="200" Margin="10" Click="Confirm"
+                FontSize="24"/>
+
+    </Grid>
+</Window>
